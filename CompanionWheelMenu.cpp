@@ -739,9 +739,9 @@ __declspec(naked) void QueuedMenuRequestHook() {
 
 bool __fastcall IsConsciousAndNotAttackingPlayer(Actor* actor) {
 	UInt32 factionPtr = 0;
-	bool isNotUnconscious = ThisCall<bool>(0x6FAF20, actor);
+	bool isConscious = ThisCall<bool>(0x6FAF20, actor);
 	bool shouldAttack = ThisCall<UInt8>(0x710630, actor, PlayerCharacter::GetSingleton(), 0, &factionPtr, 0);
-	return isNotUnconscious && !shouldAttack;
+	return isConscious && !shouldAttack;
 }
 
 __declspec(naked) void ActivationHook() {
@@ -804,6 +804,12 @@ __declspec(naked) void CreatureHook() {
 			add esp, 8
 			mov ecx, 0x54FC7C
 			jmp ecx
+	}
+}
+
+void __cdecl CreatureInCombatHook(int type, Actor* a2, int a3, int a4, int mode) {
+	if (IsConsciousAndNotAttackingPlayer) {
+		CdeclCall<void>(0x61D5A0, 8, a2, 0, 0, 0);
 	}
 }
 
@@ -895,6 +901,7 @@ void CompanionWheelMenu::InitHooks()
 
 	// queue new menu on creature activation
 	WriteRelJump(0x54FC6E, (UInt32)CreatureHook);
+	WriteRelCall(0x54F9D6, (UInt32)CreatureInCombatHook);
 
 	// change TileImage logic to include RadialTile ID
 	SafeWrite32(0xBEF209, (UInt32)&radialTraitId);
