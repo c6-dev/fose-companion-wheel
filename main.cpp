@@ -1,10 +1,8 @@
 #include "fose/PluginAPI.h"
-#include "fose/GameAPI.h"
-#include "fose/GameObjects.h"
-#include <string>
 #include "CompanionWheelMenu.h"
 #include "RadialTile.h"
 #include "fose_version.h"
+
 IDebugLog		gLog("companion_wheel.log");
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;

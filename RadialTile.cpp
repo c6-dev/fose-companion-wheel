@@ -1,5 +1,9 @@
 #include "RadialTile.h"
 
+constexpr float PI = 3.14159265358979323846;
+constexpr float TWO_PI = 2 * PI;
+constexpr float HALF_PI = PI / 2;
+
 void RadialTile::Free()
 {
 	TileImage::Free();
@@ -33,9 +37,6 @@ const char* RadialTile::GetTypeStr()
 	return "IMGR";
 }
 
-constexpr float PI = 3.14159265358979323846;
-constexpr float TWO_PI = 2 * PI;
-constexpr float HALF_PI = PI / 2;
 
 bool RadialTile::IsTargeted(float posX, float posY) {
 	float centerX = this->GetValueFloat(kTileValue_user0);
@@ -88,7 +89,6 @@ bool RadialTile::IsTargeted(float posX, float posY) {
 
 }
 
-
 void RadialTile::ClearTextures()
 {
 	ThisCall<void>(0xBEF350, this);
@@ -103,12 +103,14 @@ void RadialTile::SetShaderPropertyColorAlpha(NiNode* node, float alpha, void* ov
 {
 	ThisCall<void>(0xBEB400, this, node, alpha, overlayColor);
 }
+
 Tile* __cdecl TileCreateHook(UInt32 tileID) {
 	if (tileID == 908) {
 		return new RadialTile();
 	}
 	return CdeclCall<Tile*>(0xBF1B90, tileID);
 }
+
 bool __cdecl CheckTileTarget(Tile* tile, float posX, float posY) {
 	if (tile->GetType() == 902 && tile->GetTypeStr()[3] == 'R') { // ugly as all hell but otherwise it's 15 more hooks
 		RadialTile* rTile = (RadialTile*)tile;
@@ -116,6 +118,7 @@ bool __cdecl CheckTileTarget(Tile* tile, float posX, float posY) {
 	}
 	return true;
 }
+
 __declspec(naked) void TileTargetHook() {
 	__asm {
 
@@ -134,11 +137,12 @@ __declspec(naked) void TileTargetHook() {
 		mov eax, 0x6252CF
 		mov ecx, edi
 		jmp eax
-		DONE :
+	DONE:
 		mov eax, 0x62531F
-			jmp eax
+		jmp eax
 	}
 }
+
 void RadialTile::InitHooks()
 {
 	WriteRelCall(0xBF1D6D, (UInt32)TileCreateHook);
