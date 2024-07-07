@@ -7,6 +7,9 @@
     <Filter Include="menu">
       <UniqueIdentifier>{d527f405-5b21-49af-aa09-febf79d36f41}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{97f2995d-bbeb-44bc-a026-0bae14befd28}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fose\GameAPI.cpp">
@@ -61,6 +64,12 @@
     </ClCompile>
     <ClCompile Include="fose\netimmerse.cpp">
       <Filter>fose</Filter>
+    </ClCompile>
+    <ClCompile Include="common\IDebugLog.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\IErrors.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,14 +130,22 @@
     <ClInclude Include="fose\netimmerse.h">
       <Filter>fose</Filter>
     </ClInclude>
-    <ClInclude Include="fose\CommandTable.h">
-      <Filter>fose</Filter>
-    </ClInclude>
-    <ClInclude Include="fose\PluginAPI.h" />
     <ClInclude Include="fose\fose_version.h">
       <Filter>fose</Filter>
     </ClInclude>
-    <ClInclude Include="fose\fose_prefix.h">
+    <ClInclude Include="common\IDebugLog.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\IErrors.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\IPrefix.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ITypes.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="fose\PluginAPI.h">
       <Filter>fose</Filter>
     </ClInclude>
   </ItemGroup>

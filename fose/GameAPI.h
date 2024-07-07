@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CommandTable.h"
 #include "GameTypes.h"
 #include "Utilities.h"
 
@@ -46,8 +45,6 @@ struct ScriptEventList
 	VarEntry		* m_vars;
 
 	void	Dump(void);
-	Var *	GetVariable(UInt32 id);
-	UInt32	ResetAllVariables();
 };
 
 #if RUNTIME
@@ -64,8 +61,6 @@ const UInt32 _ConsoleManager_Print = 0;
 
 void Console_Print(const char * fmt, ...);
 
-typedef bool (* _ExtractArgs)(ParamInfo * paramInfo, void * arg1, UInt32 * arg2, TESObjectREFR * arg3, TESObjectREFR * arg4, Script * script, ScriptEventList * eventList, ...);
-extern const _ExtractArgs ExtractArgs;
 
 typedef void * (* _FormHeap_Allocate)(UInt32 size);
 extern const _FormHeap_Allocate FormHeap_Allocate;
@@ -223,47 +218,6 @@ void DumpTLSData();
 
 const UInt32 kMaxMessageLength = 0x4000;
 
-bool ExtractArgsEx(ParamInfo * paramInfo, void * scriptData, UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, ...);
-extern bool ExtractFormatStringArgs(UInt32 fmtStringPos, char* buffer, ParamInfo * paramInfo, void * scriptDataIn, UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, UInt32 maxParams, ...);
-
-// A plugin author requested the ability to use OBSE format specifiers to format strings with the args
-// coming from a source other than script.
-// So changed ExtractFormattedString to take an object derived from following class, containing the args
-// Probably doesn't belong in GameAPI.h but utilizes a bunch of stuff defined here and can't think of a better place for it
-class FormatStringArgs
-{
-public:
-	enum argType {
-		kArgType_Float,
-		kArgType_Form		// TESForm*
-	};
-
-	virtual bool Arg(argType asType, void * outResult) = 0;	// retrieve next arg
-	virtual bool SkipArgs(UInt32 numToSkip) = 0;			// skip specified # of args
-	virtual bool HasMoreArgs() = 0;
-	virtual std::string GetFormatString() = 0;						// return format string
-};
-
-// concrete class used for extracting script args
-class ScriptFormatStringArgs : public FormatStringArgs
-{
-public:
-	virtual bool Arg(argType asType, void* outResult);
-	virtual bool SkipArgs(UInt32 numToSkip);
-	virtual bool HasMoreArgs();
-	virtual std::string GetFormatString();
-
-	ScriptFormatStringArgs(UInt32 _numArgs, UInt8* _scriptData, Script* _scriptObj, ScriptEventList* _eventList);
-	UInt32 GetNumArgs();
-	UInt8* GetScriptData();
-
-private:
-	UInt32			numArgs;
-	UInt8			* scriptData;
-	Script			* scriptObj;
-	ScriptEventList	* eventList;
-	std::string fmtString;
-};
 
 enum EActorVals {
 	eActorVal_Aggression			= 0,

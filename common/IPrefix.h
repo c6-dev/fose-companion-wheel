@@ -12,14 +12,9 @@
 // win2k and above
 #define _WIN32_WINNT	0x0500
 
-#include <cstdlib>
 #include <cstdio>
-#include <cstring>
 #include "ITypes.h"
 #include "IErrors.h"
-#include "IDynamicCreate.h"
 #include "IDebugLog.h"
-#include "ISingleton.h"
-#include <winsock2.h>
 #include <Windows.h>
 #include <string>

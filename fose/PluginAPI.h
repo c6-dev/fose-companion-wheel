@@ -1,6 +1,6 @@
 #pragma once
 
-#include "fose/CommandTable.h"
+
 struct CommandInfo;
 struct ParamInfo;
 class TESObjectREFR;
@@ -15,10 +15,6 @@ enum
 	kPluginHandle_Invalid = 0xFFFFFFFF,
 };
 
-enum
-{
-	kPluginOpcode_Debug = kFoseOpCodeTest,
-};
 
 enum
 {
@@ -54,7 +50,6 @@ struct FOSEInterface
 
 	// CommandReturnType enum defined in CommandTable.h
 	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
-	bool	(* RegisterTypedCommand)(CommandInfo * info, CommandReturnType retnType);
 	// returns a full path the the game directory
 	const char* (* GetRuntimeDirectory)();
 
@@ -95,19 +90,6 @@ struct FOSEConsoleInterface
 *
 **************************************************/
 
-struct FOSEStringVarInterface
-{
-	enum {
-		kVersion = 1
-	};
-
-	UInt32		version;
-	const char* (* GetString)(UInt32 stringID);
-	void		(* SetString)(UInt32 stringID, const char* newValue);
-	UInt32		(* CreateString)(const char* value, void* owningScript);
-	void		(* Register)(FOSEStringVarInterface* intfc);
-	bool		(* Assign)(COMMAND_ARGS, const char* newValue);
-};
 
 // IsKeyPressed() takes a DirectInput scancode; values above 255 represent mouse buttons
 // codes are the same as those used by OBSE's IsKeyPressed2 command

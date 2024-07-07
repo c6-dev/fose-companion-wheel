@@ -3,8 +3,6 @@
 
 const double radialTraitId = 908.0;
 
-const char* PACKAGE_NAME = "C6CWMTravelPackage";
-
 char iniFilename[MAX_PATH];
 
 TESPackage* g_travelPackage = nullptr;

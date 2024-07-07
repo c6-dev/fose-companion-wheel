@@ -1,13 +1,11 @@
 #include "fose/PluginAPI.h"
-#include "fose/CommandTable.h"
 #include "fose/GameAPI.h"
-#include "fose/ParamInfos.h"
 #include "fose/GameObjects.h"
 #include <string>
 #include "CompanionWheelMenu.h"
 #include "RadialTile.h"
 #include "fose_version.h"
-IDebugLog		gLog("fose_plugin_example.log");
+IDebugLog		gLog("companion_wheel.log");
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -18,10 +16,9 @@ bool FOSEPlugin_Query(const FOSEInterface * fose, PluginInfo * info)
 {
 
 	info->infoVersion = PluginInfo::kInfoVersion;
-	info->name = "fose_plugin_example";
+	info->name = "Companion Wheel";
 	info->version = 1;
-	_MESSAGE("query");
-	// version checks
+
 	if (fose->isEditor) {
 		return false;
 	}

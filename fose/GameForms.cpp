@@ -100,18 +100,6 @@ Script::RefVariable	* Script::GetVariable(UInt32 reqIdx)
 	return pRefVar;
 }
 
-void Script::RefVariable::Resolve(ScriptEventList * eventList)
-{
-	if(varIdx && eventList)
-	{
-		ScriptEventList::Var	* var = eventList->GetVariable(varIdx);
-		if(var)
-		{
-			UInt32	refID = *((UInt32 *)&var->data);
-			form = LookupFormByID(refID);
-		}
-	}
-}
 
 
 EffectItem* EffectItemList::ItemAt(UInt32 whichItem)
