@@ -1,0 +1,4 @@
+LIBRARY	"companion_wheel"
+EXPORTS
+FOSEPlugin_Query
+FOSEPlugin_Load
