@@ -81,6 +81,12 @@ bool CompanionWheelMenu::IsMenuActive() {
 
 void CompanionWheelMenu::UseStimpak()
 {
+
+	if (this->dogmeatMode) {
+		this->RunTopic("DogmeatHeal");
+		return;
+	}
+
 	Actor* companion = this->companion;
 	TESForm* stimpak = CdeclCall<TESForm*>(0x508E40, 0);
 	TESBoundObject* stimpakBO = DYNAMIC_CAST(stimpak, TESForm, TESBoundObject);
@@ -130,7 +136,7 @@ void CompanionWheelMenu::SayTopic(TESTopic* topic)
 		DialogueResponse* r = item->responses.current->data;
 		if (r->soundID) {
 			Sound sound = Sound();
-			ThisCall<Sound*>(0x766C00, companion, &sound, r->soundID, 0, 0x102, 1);
+			ThisCall<Sound*>(0x766C00, companion, &sound, r->soundID->refID, 0, 0x102, 1);
 			this->sound = sound;
 		}
 		else {
@@ -285,14 +291,26 @@ void CompanionWheelMenu::SwitchAggressionMode()
 
 void CompanionWheelMenu::OpenInventory()
 {
-	this->Exit(true);
-	this->RunTopic("FollowersTrade");
+	if (dogmeatMode) {
+		this->RunTopic("DogmeatPraise");
+		this->Exit(false);
+		CdeclCall<void>(0x61D5A0, 1, this->companion, 0, 0, 3);
+	}
+	else {
+		this->Exit(true);
+		this->RunTopic("FollowersTrade");
+	}
 }
 
 void CompanionWheelMenu::SwitchStayFollow()
 {
 	this->following = this->following == 0;
-	this->RunTopic(this->following ? "FollowersLetsGo" : "FollowersWait");
+	if (this->dogmeatMode && !this->following) {
+		this->RunTopic("DogmeatWait");
+	}
+	else {
+		this->RunTopic(this->following ? "FollowersLetsGo" : "FollowersWait");
+	}
 	this->tiles[kStayFollow]->SetFloat(kTileValue_user11, !this->following);
 
 }
@@ -684,6 +702,8 @@ bool CompanionWheelMenu::ShowMenu(Actor* actor)
 	menu->followingAtDistance = actor->GetRefVarData("IsFollowingLong") == 1.0;
 	menu->preferRanged = actor->GetRefVarData("CombatStyleRanged") == 1.0;
 	menu->following = actor->GetRefVarData("Waiting") == 0.0;
+
+	menu->dogmeatMode = actor->baseForm->refID == kForms_Dogmeat;
 
 	menu->tiles[kAggressivePassive]->SetFloat(kTileValue_user11, menu->aggressive);
 	menu->tiles[kStayFollow]->SetFloat(kTileValue_user11, !menu->following);

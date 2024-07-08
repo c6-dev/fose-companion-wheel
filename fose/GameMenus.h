@@ -278,7 +278,7 @@ struct DialogueResponse
 	String voiceFilePath;// 10
 	TESIdleForm* speakerAnimation;	// 18
 	TESIdleForm* listenerAnimation;	// 1C
-	UInt32 soundID;	// 20
+	TESSound* soundID;	// 20
 	UInt8 flags;	// 24
 	UInt8 gap25[3];
 	UInt32 responseNumber; // 28

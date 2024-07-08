@@ -80,7 +80,7 @@ public:
 	bool	transitionToDialog;
 	UInt32	timeToClearSubtitle;
 	Sound	sound;
-
+	bool	dogmeatMode;
 	void HandleTileSelection(UInt32 tileID, bool fromHandleClick);
 	void HandleButtonContext(UInt32 tileID);
 	bool HasTiles();
@@ -114,4 +114,4 @@ public:
 		GameHeapFree(ptr);
 	}
 };
-STATIC_ASSERT(sizeof(CompanionWheelMenu) == 0x88);
+STATIC_ASSERT(sizeof(CompanionWheelMenu) == 0x8C);

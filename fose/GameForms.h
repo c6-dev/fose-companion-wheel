@@ -3467,4 +3467,5 @@ STATIC_ASSERT(sizeof(BGSMusicType) == 0x30);
 
 enum kForms {
 	kForms_xMarker = 0x3B,
+	kForms_Dogmeat = 0x6A772
 };
