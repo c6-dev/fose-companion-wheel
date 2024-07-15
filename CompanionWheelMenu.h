@@ -38,22 +38,31 @@ public:
 	enum Buttons
 	{
 		kAggressivePassive = 0x0,
+		kScold = 0x0,
 		kUseStimpak = 0x1,
+		kSearchAmmo = 0x1,
 		kStayFollow = 0x2,
+		kSearchWeapons = 0x2,
 		kTalkTo = 0x3,
 		kBackUp = 0x4,
 		kNearFar = 0x5,
+		kSearchChems = 0x5,
 		kOpenInventory = 0x6,
+		kSearchFood = 0x6,
 		kRangedMelee = 0x7,
+		kPraise = 0x7,
 		kTitle = 0x8,
 		kButtonText = 0x9,
 		kButtonContext = 0xA,
 		kExit = 0xB,
+		kBack = 0xB,
 		kSubtitle = 0xC,
 		k360ExitPrompt = 0xD,
+		k360BackPrompt = 0xD,
 		k360SelectPrompt = 0xE,
 		k360NavigatePrompt = 0xF,
 	};
+
 	enum MenuSounds
 	{
 		UIMenuOK = 0x1,
@@ -81,6 +90,7 @@ public:
 	UInt32	timeToClearSubtitle;
 	Sound	sound;
 	bool	dogmeatMode;
+	bool	inSubmenu;
 	void HandleTileSelection(UInt32 tileID, bool fromHandleClick);
 	void HandleButtonContext(UInt32 tileID);
 	bool HasTiles();
@@ -96,6 +106,8 @@ public:
 	void SwitchStayFollow();
 	void SwitchAggressionMode();
 	void OpenInventory();
+	void OpenDogmeatCommands();
+	void CloseDogmeatCommands();
 	NiPoint3 CalculateBackUpPos();
 
 	static CompanionWheelMenu* Create();

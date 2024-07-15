@@ -302,6 +302,31 @@ void CompanionWheelMenu::OpenInventory()
 	}
 }
 
+void CompanionWheelMenu::OpenDogmeatCommands()
+{
+	this->inSubmenu = true;
+	this->tiles[kSubtitle]->SetString("\0");
+	this->tiles[kTitle]->SetString("Dogmeat Commands");
+	this->tiles[k360BackPrompt]->SetString("Back");
+	this->tiles[kBack]->SetString("Back");
+	this->tiles[kTalkTo]->SetVisible(false);
+	this->tiles[kBackUp]->SetVisible(false);
+	this->tiles[kButtonText]->SetString("Praise");
+
+}
+
+void CompanionWheelMenu::CloseDogmeatCommands()
+{
+	this->inSubmenu = false;
+	this->tiles[kSubtitle]->SetString("\0");
+	this->tiles[kTitle]->SetString("Companion Commands");
+	this->tiles[k360ExitPrompt]->SetString("Exit");
+	this->tiles[kExit]->SetString("Exit");
+	this->tiles[kTalkTo]->SetVisible(true);
+	this->tiles[kBackUp]->SetVisible(true);
+	this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
+}
+
 void CompanionWheelMenu::SwitchStayFollow()
 {
 	this->following = this->following == 0;
@@ -357,60 +382,133 @@ void CompanionWheelMenu::TransitionToDialog()
 void CompanionWheelMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 {
 	if (!IsMenuActive()) return;
-
-	switch (tileID)
-	{
-	case kAggressivePassive:
-		this->SwitchAggressionMode();
-		this->HandleTileSelection(tileID, 1);
-		PlayMenuSound(UIMenuOK);
-		break;
-	case kUseStimpak:
-		this->UseStimpak();
-		this->HandleTileSelection(tileID, 1);
-		PlayMenuSound(UIMenuOK);
-		break;
-	case kStayFollow:
-		this->SwitchStayFollow();
-		this->HandleTileSelection(tileID, 1);
-		PlayMenuSound(UIMenuOK);
-		break;
-	case kTalkTo:
-		PlayMenuSound(UIMenuOK);
-		this->transitionToDialog = true;
-		this->Exit(true);
-		break;
-	case kBackUp:
-		PlayMenuSound(UIMenuOK);
-		this->BackUp();
-		this->Exit(true);
-		break;
-	case kNearFar:
-		this->SwitchFollowDistance();
-		this->HandleTileSelection(tileID, 1);
-		PlayMenuSound(UIMenuOK);
-		break;
-	case kOpenInventory:
-		PlayMenuSound(UIMenuOK);
-		this->OpenInventory();
-		break;
-	case kRangedMelee:
-		this->SwitchRangedMelee();
-		this->HandleTileSelection(tileID, 1);
-		PlayMenuSound(UIMenuOK);
-		break;
-	case kExit:
-		PlayMenuSound(UIMenuOK);
-		this->Exit(true);
-		break;
-	default:
-		break;
+	if (this->inSubmenu) {
+		switch (tileID)
+		{
+		case kPraise:
+			this->RunTopic("DogmeatPraise");
+			break;
+		case kScold:
+			this->RunTopic("DogmeatScold");
+			break;
+		case kSearchAmmo:
+			this->RunTopic("DogmeatSearchAmmo");
+			this->Exit(true);
+			break;
+		case kSearchWeapons:
+			this->RunTopic("DogmeatSearchWeapons");
+			this->Exit(true);
+			break;
+		case kSearchChems:
+			this->RunTopic("DogmeatSearchChems");
+			this->Exit(true);
+			break;
+		case kSearchFood:
+			this->RunTopic("DogmeatSearchFood");
+			this->Exit(true);
+			break;
+		case kBack:
+			this->CloseDogmeatCommands();
+			break;
+		default:
+			break;
+		}
+	}
+	else {
+		switch (tileID)
+		{
+		case kAggressivePassive:
+			this->SwitchAggressionMode();
+			this->HandleTileSelection(tileID, 1);
+			PlayMenuSound(UIMenuOK);
+			break;
+		case kUseStimpak:
+			this->UseStimpak();
+			this->HandleTileSelection(tileID, 1);
+			PlayMenuSound(UIMenuOK);
+			break;
+		case kStayFollow:
+			this->SwitchStayFollow();
+			this->HandleTileSelection(tileID, 1);
+			PlayMenuSound(UIMenuOK);
+			break;
+		case kTalkTo:
+			PlayMenuSound(UIMenuOK);
+			this->transitionToDialog = true;
+			this->Exit(true);
+			break;
+		case kBackUp:
+			PlayMenuSound(UIMenuOK);
+			this->BackUp();
+			this->Exit(true);
+			break;
+		case kNearFar:
+			this->SwitchFollowDistance();
+			this->HandleTileSelection(tileID, 1);
+			PlayMenuSound(UIMenuOK);
+			break;
+		case kOpenInventory:
+			PlayMenuSound(UIMenuOK);
+			this->OpenInventory();
+			break;
+		case kRangedMelee:
+			if (this->dogmeatMode) {
+				this->OpenDogmeatCommands();
+			}
+			else {
+				this->SwitchRangedMelee();
+				this->HandleTileSelection(tileID, 1);
+			}	
+			PlayMenuSound(UIMenuOK);
+			break;
+		case kExit:
+			PlayMenuSound(UIMenuOK);
+			this->Exit(true);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
 void CompanionWheelMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
-	if (IsMenuActive() && tileID >= kAggressivePassive && (tileID <= kRangedMelee || tileID == kExit)) HandleTileSelection(tileID, false);
+	if (IsMenuActive() && tileID >= kAggressivePassive && (tileID <= kRangedMelee || tileID == kExit)) {
+		if (this->inSubmenu) {
+			this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
+			this->lastTile = tileID;
+			this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
+			switch (tileID) {
+			case kPraise:
+				this->tiles[kButtonText]->SetString("Praise");
+				break;
+			case kScold:
+				this->tiles[kButtonText]->SetString("Scold");
+				break;
+			case kSearchAmmo:
+				this->tiles[kButtonText]->SetString("Look for Ammo");
+				break;
+			case kSearchChems:
+				this->tiles[kButtonText]->SetString("Look for Chems");
+				break;
+			case kSearchWeapons:
+				this->tiles[kButtonText]->SetString("Look for Weapons");
+				break;
+			case kSearchFood:
+				this->tiles[kButtonText]->SetString("Look for Food");
+				break;
+			case kBack:
+				this->tiles[kButtonText]->SetString("Back");
+				break;
+			default:
+				this->tiles[kButtonText]->SetString("\0");
+				break;
+			}
+		}
+		else {
+			this->HandleTileSelection(tileID, false);
+		}
+	}
 }
 
 bool IsMouseNotVisibleAndControllerConnected() {
@@ -580,7 +678,7 @@ void CompanionWheelMenu::HandleTileSelection(UInt32 tileID, bool clicked) {
 				lastTile->SetFloat(kTileValue_user11, this->followingAtDistance);
 				break;
 			case kRangedMelee:
-				lastTile->SetFloat(kTileValue_user11, this->preferRanged);
+				if (!this->dogmeatMode) lastTile->SetFloat(kTileValue_user11, this->preferRanged);
 				break;
 			default:
 				break;
@@ -589,7 +687,7 @@ void CompanionWheelMenu::HandleTileSelection(UInt32 tileID, bool clicked) {
 
 		// handle current tile
 		this->lastTile = tileID;
-		if (tileID != -1 && this->tiles[tileID]) {
+		if (tileID != -1) {
 			this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
 		}
 		switch (tileID) {
@@ -618,8 +716,13 @@ void CompanionWheelMenu::HandleTileSelection(UInt32 tileID, bool clicked) {
 			this->tiles[kButtonText]->SetString("Open Inventory");
 			break;
 		case kRangedMelee:
-			this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
-			this->tiles[kRangedMelee]->SetFloat(kTileValue_user11, !this->preferRanged);
+			if (this->dogmeatMode) {
+				this->tiles[kButtonText]->SetString("Dogmeat Commands");
+			}
+			else {
+				this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
+				this->tiles[kRangedMelee]->SetFloat(kTileValue_user11, !this->preferRanged);
+			}
 			break;
 		case kExit:
 			this->tiles[kButtonText]->SetString("Exit");
@@ -704,7 +807,7 @@ bool CompanionWheelMenu::ShowMenu(Actor* actor)
 	menu->following = actor->GetRefVarData("Waiting") == 0.0;
 
 	menu->dogmeatMode = actor->baseForm->refID == kForms_Dogmeat;
-
+	menu->inSubmenu = false;
 	menu->tiles[kAggressivePassive]->SetFloat(kTileValue_user11, menu->aggressive);
 	menu->tiles[kStayFollow]->SetFloat(kTileValue_user11, !menu->following);
 	menu->tiles[kNearFar]->SetFloat(kTileValue_user11, menu->followingAtDistance);
@@ -828,7 +931,7 @@ __declspec(naked) void CreatureHook() {
 }
 
 void __cdecl CreatureInCombatHook(int type, Actor* a2, int a3, int a4, int mode) {
-	if (IsConsciousAndNotAttackingPlayer) {
+	if (IsConsciousAndNotAttackingPlayer(a2)) {
 		CdeclCall<void>(0x61D5A0, 8, a2, 0, 0, 0);
 	}
 }
