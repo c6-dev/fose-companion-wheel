@@ -319,6 +319,10 @@ void CompanionWheelMenu::OpenDogmeatCommands()
 	this->tiles[kBackUp]->SetVisible(false);
 	this->tiles[kButtonText]->SetString("Praise");
 
+	for (int i = kScold; i < kTitle; i++) {
+		if (i == kTalkTo || i == kBackUp) continue;
+		this->tiles[i]->SetFloat(kTileValue_user14, 1);
+	}
 }
 
 void CompanionWheelMenu::CloseDogmeatCommands()
@@ -331,6 +335,10 @@ void CompanionWheelMenu::CloseDogmeatCommands()
 	this->tiles[kTalkTo]->SetVisible(true);
 	this->tiles[kBackUp]->SetVisible(true);
 	this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
+	for (int i = kAggressivePassive; i < kTitle; i++) {
+		if (i == kTalkTo || i == kBackUp) continue;
+		this->tiles[i]->SetFloat(kTileValue_user14, 0);
+	}
 }
 
 void CompanionWheelMenu::SwitchStayFollow()
@@ -598,7 +606,7 @@ void CompanionWheelMenu::Update()
 			angle = 0.55000001;
 		}
 
-		for (UInt32 tileID = 0; tileID < 16; ++tileID) {
+		for (UInt32 tileID = kAggressivePassive; tileID < kMax; ++tileID) {
 			if (strcmp(this->tiles[tileID]->GetTypeStr(), "IMGR") == 0) {
 				float minAngle = this->tiles[tileID]->GetValueFloat(kTileValue_user2);
 				float maxAngle = this->tiles[tileID]->GetValueFloat(kTileValue_user3);

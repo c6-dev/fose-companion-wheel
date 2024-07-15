@@ -61,6 +61,7 @@ public:
 		k360BackPrompt = 0xD,
 		k360SelectPrompt = 0xE,
 		k360NavigatePrompt = 0xF,
+		kMax = 0x10
 	};
 
 	enum MenuSounds
