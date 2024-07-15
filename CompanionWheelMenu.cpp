@@ -71,7 +71,13 @@ void CompanionWheelMenu::Exit(bool stopSound)
 
 void CompanionWheelMenu::PlayMenuSound(MenuSounds code)
 {
-	CdeclCall<void>(0x61E7D0, code);
+	if (code == UIPipBoyScroll) {
+		Sound sound("UIPipBoyScroll", 0x121);
+		sound.Play();
+	}
+	else {
+		CdeclCall<void>(0x61E7D0, code);
+	}
 }
 
 bool CompanionWheelMenu::IsMenuActive() {
@@ -383,6 +389,7 @@ void CompanionWheelMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 {
 	if (!IsMenuActive()) return;
 	if (this->inSubmenu) {
+		PlayMenuSound(UIMenuOK);
 		switch (tileID)
 		{
 		case kPraise:
@@ -474,40 +481,7 @@ void CompanionWheelMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 void CompanionWheelMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
 	if (IsMenuActive() && tileID >= kAggressivePassive && (tileID <= kRangedMelee || tileID == kExit)) {
-		if (this->inSubmenu) {
-			this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
-			this->lastTile = tileID;
-			this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
-			switch (tileID) {
-			case kPraise:
-				this->tiles[kButtonText]->SetString("Praise");
-				break;
-			case kScold:
-				this->tiles[kButtonText]->SetString("Scold");
-				break;
-			case kSearchAmmo:
-				this->tiles[kButtonText]->SetString("Look for Ammo");
-				break;
-			case kSearchChems:
-				this->tiles[kButtonText]->SetString("Look for Chems");
-				break;
-			case kSearchWeapons:
-				this->tiles[kButtonText]->SetString("Look for Weapons");
-				break;
-			case kSearchFood:
-				this->tiles[kButtonText]->SetString("Look for Food");
-				break;
-			case kBack:
-				this->tiles[kButtonText]->SetString("Back");
-				break;
-			default:
-				this->tiles[kButtonText]->SetString("\0");
-				break;
-			}
-		}
-		else {
-			this->HandleTileSelection(tileID, false);
-		}
+		this->HandleTileSelection(tileID);
 	}
 }
 
@@ -519,20 +493,46 @@ void CompanionWheelMenu::HandleMousewheel(UInt32 auiTileID, Tile* apTile)
 {
 	if (!IsMenuActive()) return;
 	float wheelDirection = InterfaceManager::GetSingleton()->mouseWheel;
-	if (wheelDirection < 0) {
-		if (this->lastTile < kAggressivePassive || this->lastTile >= kRangedMelee) {
-			this->HandleTileSelection(kAggressivePassive, false);
+
+	if (this->inSubmenu) {
+		if (wheelDirection < 0) {
+			if (this->lastTile < kScold || this->lastTile >= kPraise) {
+				this->HandleTileSelection(kScold);
+			}
+			else if (this->lastTile == kSearchWeapons) {
+				this->HandleTileSelection(kSearchChems);
+			} else {
+				this->HandleTileSelection(this->lastTile + 1);
+			}
 		}
 		else {
-			this->HandleTileSelection(this->lastTile + 1, false);
+			if (this->lastTile <= kScold || this->lastTile > kPraise) {
+				this->HandleTileSelection(kPraise);
+			}
+			else if (this->lastTile == kSearchChems) {
+				this->HandleTileSelection(kSearchWeapons);
+			}
+			else {
+				this->HandleTileSelection(this->lastTile - 1);
+			}
 		}
 	}
 	else {
-		if (this->lastTile <= kAggressivePassive || this->lastTile > kRangedMelee) {
-			this->HandleTileSelection(kRangedMelee, false);
+		if (wheelDirection < 0) {
+			if (this->lastTile < kAggressivePassive || this->lastTile >= kRangedMelee) {
+				this->HandleTileSelection(kAggressivePassive);
+			}
+			else {
+				this->HandleTileSelection(this->lastTile + 1);
+			}
 		}
 		else {
-			this->HandleTileSelection(this->lastTile - 1, false);
+			if (this->lastTile <= kAggressivePassive || this->lastTile > kRangedMelee) {
+				this->HandleTileSelection(kRangedMelee);
+			}
+			else {
+				this->HandleTileSelection(this->lastTile - 1);
+			}
 		}
 	}
 }
@@ -603,7 +603,7 @@ void CompanionWheelMenu::Update()
 				float minAngle = this->tiles[tileID]->GetValueFloat(kTileValue_user2);
 				float maxAngle = this->tiles[tileID]->GetValueFloat(kTileValue_user3);
 				if (angle >= minAngle && angle < maxAngle) {
-					this->HandleTileSelection(tileID, 0);
+					this->HandleTileSelection(tileID);
 					break;
 				}
 			}
@@ -658,80 +658,113 @@ bool CompanionWheelMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code
 
 
 void CompanionWheelMenu::HandleTileSelection(UInt32 tileID, bool clicked) {
-	if (clicked || this->lastTile != tileID) {
-		Sound sound("UIPipBoyScroll", 0x121);
-		sound.Play();
-
-		// handle last tile
-		if (this->lastTile != -1) {
-			this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
-
-			Tile* lastTile = this->tiles[this->lastTile];
-			switch (this->lastTile) {
-			case kAggressivePassive:
-				lastTile->SetFloat(kTileValue_user11, this->aggressive);
-				break;
-			case kStayFollow:
-				lastTile->SetFloat(kTileValue_user11, !this->following);
-				break;
-			case kNearFar:
-				lastTile->SetFloat(kTileValue_user11, this->followingAtDistance);
-				break;
-			case kRangedMelee:
-				if (!this->dogmeatMode) lastTile->SetFloat(kTileValue_user11, this->preferRanged);
-				break;
-			default:
-				break;
-			}
-		}
-
-		// handle current tile
+	if (this->inSubmenu) {
+		PlayMenuSound(UIPipBoyScroll);
+		this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
 		this->lastTile = tileID;
-		if (tileID != -1) {
-			this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
-		}
+		this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
 		switch (tileID) {
-		case kAggressivePassive:
-			this->tiles[kButtonText]->SetString(this->aggressive ? "Be Passive" : "Be Aggressive");
-			this->tiles[kAggressivePassive]->SetFloat(kTileValue_user11, !this->aggressive);
+		case kPraise:
+			this->tiles[kButtonText]->SetString("Praise");
 			break;
-		case kUseStimpak:
-			this->tiles[kButtonText]->SetString("Use Stimpak");
+		case kScold:
+			this->tiles[kButtonText]->SetString("Scold");
 			break;
-		case kStayFollow:
-			this->tiles[kButtonText]->SetString(this->following ? "Wait Here" : "Follow Me");
-			this->tiles[kStayFollow]->SetFloat(kTileValue_user11, this->following);
+		case kSearchAmmo:
+			this->tiles[kButtonText]->SetString("Look for Ammo");
 			break;
-		case kTalkTo:
-			this->tiles[kButtonText]->SetString("Talk To");
+		case kSearchChems:
+			this->tiles[kButtonText]->SetString("Look for Chems");
 			break;
-		case kBackUp:
-			this->tiles[kButtonText]->SetString("Back Up");
+		case kSearchWeapons:
+			this->tiles[kButtonText]->SetString("Look for Weapons");
 			break;
-		case kNearFar:
-			this->tiles[kButtonText]->SetString(this->followingAtDistance ? "Stay Close" : "Keep Distance");
-			this->tiles[kNearFar]->SetFloat(kTileValue_user11, !this->followingAtDistance);
+		case kSearchFood:
+			this->tiles[kButtonText]->SetString("Look for Food");
 			break;
-		case kOpenInventory:
-			this->tiles[kButtonText]->SetString("Open Inventory");
-			break;
-		case kRangedMelee:
-			if (this->dogmeatMode) {
-				this->tiles[kButtonText]->SetString("Dogmeat Commands");
-			}
-			else {
-				this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
-				this->tiles[kRangedMelee]->SetFloat(kTileValue_user11, !this->preferRanged);
-			}
-			break;
-		case kExit:
-			this->tiles[kButtonText]->SetString("Exit");
+		case kBack:
+			this->tiles[kButtonText]->SetString("Back");
 			break;
 		default:
 			this->tiles[kButtonText]->SetString("\0");
 			break;
 		}
-		this->HandleButtonContext(this->lastTile);
+	}
+	else {
+		if (clicked || this->lastTile != tileID) {
+			PlayMenuSound(UIPipBoyScroll);
+
+			// handle last tile
+			if (this->lastTile != -1) {
+				this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
+
+				Tile* lastTile = this->tiles[this->lastTile];
+				switch (this->lastTile) {
+				case kAggressivePassive:
+					lastTile->SetFloat(kTileValue_user11, this->aggressive);
+					break;
+				case kStayFollow:
+					lastTile->SetFloat(kTileValue_user11, !this->following);
+					break;
+				case kNearFar:
+					lastTile->SetFloat(kTileValue_user11, this->followingAtDistance);
+					break;
+				case kRangedMelee:
+					if (!this->dogmeatMode) lastTile->SetFloat(kTileValue_user11, this->preferRanged);
+					break;
+				default:
+					break;
+				}
+			}
+
+			// handle current tile
+			this->lastTile = tileID;
+			if (tileID != -1) {
+				this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
+			}
+			switch (tileID) {
+			case kAggressivePassive:
+				this->tiles[kButtonText]->SetString(this->aggressive ? "Be Passive" : "Be Aggressive");
+				this->tiles[kAggressivePassive]->SetFloat(kTileValue_user11, !this->aggressive);
+				break;
+			case kUseStimpak:
+				this->tiles[kButtonText]->SetString("Use Stimpak");
+				break;
+			case kStayFollow:
+				this->tiles[kButtonText]->SetString(this->following ? "Wait Here" : "Follow Me");
+				this->tiles[kStayFollow]->SetFloat(kTileValue_user11, this->following);
+				break;
+			case kTalkTo:
+				this->tiles[kButtonText]->SetString("Talk To");
+				break;
+			case kBackUp:
+				this->tiles[kButtonText]->SetString("Back Up");
+				break;
+			case kNearFar:
+				this->tiles[kButtonText]->SetString(this->followingAtDistance ? "Stay Close" : "Keep Distance");
+				this->tiles[kNearFar]->SetFloat(kTileValue_user11, !this->followingAtDistance);
+				break;
+			case kOpenInventory:
+				this->tiles[kButtonText]->SetString("Open Inventory");
+				break;
+			case kRangedMelee:
+				if (this->dogmeatMode) {
+					this->tiles[kButtonText]->SetString("Dogmeat Commands");
+				}
+				else {
+					this->tiles[kButtonText]->SetString(this->preferRanged ? "Use Melee" : "Use Ranged");
+					this->tiles[kRangedMelee]->SetFloat(kTileValue_user11, !this->preferRanged);
+				}
+				break;
+			case kExit:
+				this->tiles[kButtonText]->SetString("Exit");
+				break;
+			default:
+				this->tiles[kButtonText]->SetString("\0");
+				break;
+			}
+			this->HandleButtonContext(this->lastTile);
+		}
 	}
 }
 

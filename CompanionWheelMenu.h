@@ -74,6 +74,7 @@ public:
 		UIPopUpMessageGeneral_ = 0x13,
 		UILevelUp = 0x15,
 		UIMenuMode = 0x24,
+		UIPipBoyScroll = 0x100,
 	};
 
 	enum {
@@ -91,7 +92,7 @@ public:
 	Sound	sound;
 	bool	dogmeatMode;
 	bool	inSubmenu;
-	void HandleTileSelection(UInt32 tileID, bool fromHandleClick);
+	void HandleTileSelection(UInt32 tileID, bool fromHandleClick = false);
 	void HandleButtonContext(UInt32 tileID);
 	bool HasTiles();
 
