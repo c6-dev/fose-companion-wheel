@@ -858,6 +858,12 @@ bool CompanionWheelMenu::ShowMenu(Actor* actor)
 	menu->tiles[k360ExitPrompt]->SetString("Exit");
 	menu->tiles[k360SelectPrompt]->SetString("Select");
 	menu->tiles[k360NavigatePrompt]->SetString("Navigate");
+	if (menu->dogmeatMode) {
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user8, "Interface\\companion_wheel\\comp_dogmeat_off.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user12, "Interface\\companion_wheel\\comp_dogmeat_off.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user9, "Interface\\companion_wheel\\comp_dogmeat_on.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user13, "Interface\\companion_wheel\\comp_dogmeat_on.dds");
+	}
 	Sound sound("UIPopUpMessageGeneral", 0x121);
 	sound.Play();
 	float stackingType = tile->GetValueFloat(kTileValue_stackingtype);
@@ -911,7 +917,7 @@ bool __fastcall IsConsciousAndNotAttackingPlayer(Actor* actor) {
 __declspec(naked) void ActivationHook() {
 	static const UInt32 activationQueueAddr = 0x61D5A0;
 	__asm {
-		cmp byte ptr[esi + 0x181], 0
+		cmp byte ptr ds:[esi + 0x181], 0
 		jz DONE
 		cmp edi, 0x107A104
 		jz DONE
@@ -925,7 +931,7 @@ __declspec(naked) void ActivationHook() {
 		push esi
 		push 8
 		call activationQueueAddr
-		add esp, 14
+		add esp, 0x14
 		DONERET:
 		xor al, al
 			mov ecx, 0x5573A7
@@ -943,7 +949,7 @@ __declspec(naked) void CreatureHook() {
 	static const UInt32 activationQueueAddr = 0x61D5A0;
 	static const UInt32 HTAddr = 0x563CF0;
 	__asm {
-		cmp byte ptr[esi + 0x181], 0
+		cmp byte ptr ds:[esi + 0x181], 0
 		jz DONE
 		mov ecx, esi
 		call IsConsciousAndNotAttackingPlayer
