@@ -837,10 +837,10 @@ bool CompanionWheelMenu::ShowMenu(Actor* actor)
 	menu->tiles[k360SelectPrompt]->SetString("Select");
 	menu->tiles[k360NavigatePrompt]->SetString("Navigate");
 	if (menu->dogmeatMode) {
-		menu->tiles[kRangedMelee]->SetString(kTileValue_user8, "Interface\\companion_wheel\\comp_dogmeat_off.dds");
-		menu->tiles[kRangedMelee]->SetString(kTileValue_user12, "Interface\\companion_wheel\\comp_dogmeat_off.dds");
-		menu->tiles[kRangedMelee]->SetString(kTileValue_user9, "Interface\\companion_wheel\\comp_dogmeat_on.dds");
-		menu->tiles[kRangedMelee]->SetString(kTileValue_user13, "Interface\\companion_wheel\\comp_dogmeat_on.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user8, "Interface\\companion_wheel\\dogmeat_off.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user12, "Interface\\companion_wheel\\dogmeat_off.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user9, "Interface\\companion_wheel\\dogmeat_on.dds");
+		menu->tiles[kRangedMelee]->SetString(kTileValue_user13, "Interface\\companion_wheel\\dogmeat_on.dds");
 	}
 	Sound sound("UIPopUpMessageGeneral", 0x121);
 	sound.Play();
