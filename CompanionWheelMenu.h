@@ -7,6 +7,7 @@ private:
 	void Free();
 	bool IsMenuActive();
 	void TransitionToDialog();
+	void EvaluatePackage();
 public:
 	CompanionWheelMenu() {
 		memset(tiles, 0, sizeof(tiles));

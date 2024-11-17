@@ -248,7 +248,11 @@ TESObjectREFR* GetTravelRef(NiPoint3* pos) {
 	return ref;
 
 }
-
+void CompanionWheelMenu::EvaluatePackage() {
+	if ((this->companion->flags & 0x800) == 0 && (this->companion->flags & 0x20) == 0)  {
+		ThisCall<void>(0x709630, this->companion, 0, 0);
+	}
+}
 void CompanionWheelMenu::BackUp()
 {
 	NiPoint3 pos = this->CalculateBackUpPos();
@@ -298,9 +302,7 @@ void CompanionWheelMenu::SwitchAggressionMode()
 void CompanionWheelMenu::OpenInventory()
 {
 	if (dogmeatMode) {
-		this->RunTopic("DogmeatPraise");
-		this->Exit(false);
-		CdeclCall<void>(0x61D5A0, 1, this->companion, 0, 0, 3);
+		this->RunTopic("DogmeatScold");
 	}
 	else {
 		this->Exit(true);
@@ -378,18 +380,22 @@ void CompanionWheelMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 			this->RunTopic("DogmeatScold");
 			break;
 		case kSearchAmmo:
+			this->RunTopic("DogmeatSearchStart");
 			this->RunTopic("DogmeatSearchAmmo");
 			this->Exit(true);
 			break;
 		case kSearchWeapons:
+			this->RunTopic("DogmeatSearchStart");
 			this->RunTopic("DogmeatSearchWeapons");
 			this->Exit(true);
 			break;
 		case kSearchChems:
+			this->RunTopic("DogmeatSearchStart");
 			this->RunTopic("DogmeatSearchChems");
 			this->Exit(true);
 			break;
 		case kSearchFood:
+			this->RunTopic("DogmeatSearchStart");
 			this->RunTopic("DogmeatSearchFood");
 			this->Exit(true);
 			break;
@@ -637,42 +643,41 @@ bool CompanionWheelMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code
 
 
 void CompanionWheelMenu::HandleTileSelection(UInt32 tileID, bool clicked) {
-	if (this->inSubmenu) {
+	if (clicked || this->lastTile != tileID) {
 		PlayMenuSound(UIPipBoyScroll);
-		this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
-		this->lastTile = tileID;
-		this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
-		switch (tileID) {
-		case kPraise:
-			this->tiles[kButtonText]->SetString("Praise");
-			break;
-		case kScold:
-			this->tiles[kButtonText]->SetString("Scold");
-			break;
-		case kSearchAmmo:
-			this->tiles[kButtonText]->SetString("Look for Ammo");
-			break;
-		case kSearchChems:
-			this->tiles[kButtonText]->SetString("Look for Chems");
-			break;
-		case kSearchWeapons:
-			this->tiles[kButtonText]->SetString("Look for Weapons");
-			break;
-		case kSearchFood:
-			this->tiles[kButtonText]->SetString("Look for Food");
-			break;
-		case kBack:
-			this->tiles[kButtonText]->SetString("Back");
-			break;
-		default:
-			this->tiles[kButtonText]->SetString("\0");
-			break;
+		if (this->inSubmenu) {
+			
+			this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
+			this->lastTile = tileID;
+			this->tiles[tileID]->SetFloat(kTileValue_user10, 1.0);
+			switch (tileID) {
+			case kPraise:
+				this->tiles[kButtonText]->SetString("Praise");
+				break;
+			case kScold:
+				this->tiles[kButtonText]->SetString("Scold");
+				break;
+			case kSearchAmmo:
+				this->tiles[kButtonText]->SetString("Look for Ammo");
+				break;
+			case kSearchChems:
+				this->tiles[kButtonText]->SetString("Look for Chems");
+				break;
+			case kSearchWeapons:
+				this->tiles[kButtonText]->SetString("Look for Weapons");
+				break;
+			case kSearchFood:
+				this->tiles[kButtonText]->SetString("Look for Food");
+				break;
+			case kBack:
+				this->tiles[kButtonText]->SetString("Back");
+				break;
+			default:
+				this->tiles[kButtonText]->SetString("\0");
+				break;
+			}
 		}
-	}
-	else {
-		if (clicked || this->lastTile != tileID) {
-			PlayMenuSound(UIPipBoyScroll);
-
+		else {
 			// handle last tile
 			if (this->lastTile != -1) {
 				this->tiles[this->lastTile]->SetFloat(kTileValue_user10, 0.0);
@@ -770,9 +775,11 @@ void CompanionWheelMenu::HandleButtonContext(UInt32 tileID)
 	}
 	case kOpenInventory:
 	{
-		float inventoryWeight = this->companion->GetInventoryWeight();
-		float maxCarryWeight = this->companion->GetCalculatedCarryWeight();
-		snprintf(strBuf, MAX_PATH, "Wg  %.f/%.f", inventoryWeight, maxCarryWeight);
+		if (!this->dogmeatMode) {
+			float inventoryWeight = this->companion->GetInventoryWeight();
+			float maxCarryWeight = this->companion->GetCalculatedCarryWeight();
+			snprintf(strBuf, MAX_PATH, "Wg  %.f/%.f", inventoryWeight, maxCarryWeight);
+		}
 		break;
 	}
 	case kRangedMelee:
