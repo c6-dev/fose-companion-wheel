@@ -3,7 +3,7 @@
 #include "RadialTile.h"
 #include "fose_version.h"
 
-IDebugLog		gLog("companion_wheel.log");
+//IDebugLog		gLog("companion_wheel.log");
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
