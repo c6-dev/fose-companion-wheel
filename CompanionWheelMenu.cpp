@@ -361,35 +361,6 @@ void CompanionWheelMenu::TransitionToDialog()
 	ThisCall<void>(0x7D0710, cData, 0, 0);
 	CdeclCall<void>(0x61D5A0, 4, this->companion, 0, 0, 1);
 
-	// part of obsidian spaghetti that isn't actually needed below
-
-	/*if (companion->lifeState == 1) return;
-
-	auto actorProcess = companion->baseProcess;
-
-	if (!actorProcess) return;
-	if ((actorProcess->GetCommandingActor() == nullptr || companion->IsDying(false)) && actorProcess->GetFadeState() == HighProcess::FADE_NORMAL) {
-		auto playerProcess = PlayerCharacter::GetSingleton()->baseProcess;
-		auto playerPackage = playerProcess->GetRunningPackage();
-		auto actorPackage = actorProcess->GetRunningPackage();
-		if (companion->inCombat) {
-			VATSCameraData* cData = VATSCameraData::GetSingleton();
-			ThisCall<void>(0x7D0710, cData, 0, 0);
-			CdeclCall<void>(0x61D5A0, 4, companion, 0, 0, 1);
-			return;
-		}
-		int sitSleepState = companion->sitSleepState;
-		FurnitureMark* fm = (FurnitureMark*)actorProcess->GetFurnitureMark();
-
-		if (!sitSleepState || sitSleepState == kSitSleepState_Sleeping || sitSleepState == kSitSleepState_Sitting || (fm && fm->eType > 0x13)) {
-			if (companion->lifeState != 4 && !companion->IsDying(false) && (!actorProcess->GetKnockedState() || !companion->IsEssential())) {
-				if (!playerPackage || !playerPackage->package || playerPackage->package->IsInterruptPackage() || playerPackage->package->type == TESPackage::kPackageType_Explore || playerPackage->package->type == TESPackage::kPackageType_Ambush) {
-
-				}
-			}
-		}
-	}*/
-
 }
 
 
@@ -586,7 +557,7 @@ void CompanionWheelMenu::Update()
 		if (fThumbLX < 0.0 && fThumbLY < 0.0)
 			angle += 6.283180236816406;
 
-		// clamp angle
+
 		if (angle < 0.0 || angle >= 5.759578) {
 			angle = 5.6999998;
 		}

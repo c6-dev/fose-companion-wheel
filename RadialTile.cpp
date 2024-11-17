@@ -46,7 +46,6 @@ bool RadialTile::IsTargeted(float posX, float posY) {
 	float minMagnitude = this->GetValueFloat(kTileValue_user4);
 	float maxMagnitude = this->GetValueFloat(kTileValue_user5);
 
-	// Retrieve width and adjust if necessary
 	float width = (float)StdCall<double>(0x61A670);
 	if (width == 0.0) width = 1.0;
 	if (InterfaceManager::GetSingleton()->menuRoot) {
@@ -62,11 +61,9 @@ bool RadialTile::IsTargeted(float posX, float posY) {
 		width = 1.0;
 	}
 
-	// Transform coordinates
 	float fX = posX * width - centerX;
 	float fY = posY * width - centerY;
 
-	// Calculate the angle
 	float angle = 0.0;
 	if (fY == 0.0) {
 		angle = fX <= 0.0 ? 3 * HALF_PI : HALF_PI;
@@ -78,13 +75,10 @@ bool RadialTile::IsTargeted(float posX, float posY) {
 	if (fY > 0.0) angle += PI;
 	if (fX < 0.0 && fY < 0.0) angle += TWO_PI;
 
-	// Check angle range
 	if (angle < minAngle || angle > maxAngle) return false;
 
-	// Calculate magnitude
 	float magnitude = sqrt(fX * fX + fY * fY);
 
-	// Check magnitude range
 	return (magnitude >= minMagnitude && magnitude <= maxMagnitude);
 
 }
