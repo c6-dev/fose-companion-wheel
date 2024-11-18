@@ -90,7 +90,7 @@ copy "$(OutDir)$(TargetName).pdb" "$(LOCALAPPDATA)\ModOrganizer\Fallout 3\mods\$
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(SolutionDir)fose;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)common;$(SolutionDir)fose;$(SolutionDir)code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -134,15 +134,15 @@ copy "$(OutDir)$(TargetName).pdb" "$(LOCALAPPDATA)\ModOrganizer\Fallout 3\mods\$
     <ClCompile Include="fose\netimmerse.cpp" />
     <ClCompile Include="fose\Utilities.cpp" />
     <ClCompile Include="fose\SafeWrite.cpp" />
-    <ClCompile Include="CompanionWheelMenu.cpp" />
+    <ClCompile Include="code\CompanionWheelMenu.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="RadialTile.cpp" />
+    <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\RadialTile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common\IDebugLog.h" />
@@ -168,8 +168,8 @@ copy "$(OutDir)$(TargetName).pdb" "$(LOCALAPPDATA)\ModOrganizer\Fallout 3\mods\$
     <ClInclude Include="fose\PluginAPI.h" />
     <ClInclude Include="fose\Utilities.h" />
     <ClInclude Include="fose\SafeWrite.h" />
-    <ClInclude Include="CompanionWheelMenu.h" />
-    <ClInclude Include="RadialTile.h" />
+    <ClInclude Include="code\CompanionWheelMenu.h" />
+    <ClInclude Include="code\RadialTile.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

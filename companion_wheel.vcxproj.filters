@@ -52,11 +52,11 @@
       <Filter>fose</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="RadialTile.cpp">
+    <ClCompile Include="code\main.cpp" />
+    <ClCompile Include="code\RadialTile.cpp">
       <Filter>menu</Filter>
     </ClCompile>
-    <ClCompile Include="CompanionWheelMenu.cpp">
+    <ClCompile Include="code\CompanionWheelMenu.cpp">
       <Filter>menu</Filter>
     </ClCompile>
     <ClCompile Include="fose\GameTiles.cpp">
@@ -115,10 +115,10 @@
     <ClInclude Include="fose\Utilities.h">
       <Filter>fose</Filter>
     </ClInclude>
-    <ClInclude Include="RadialTile.h">
+    <ClInclude Include="code\RadialTile.h">
       <Filter>menu</Filter>
     </ClInclude>
-    <ClInclude Include="CompanionWheelMenu.h">
+    <ClInclude Include="code\CompanionWheelMenu.h">
       <Filter>menu</Filter>
     </ClInclude>
     <ClInclude Include="fose\GameTiles.h">
