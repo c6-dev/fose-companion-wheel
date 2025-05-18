@@ -875,7 +875,7 @@ __declspec(naked) void QueuedMenuRequestHook() {
 		cmp eax, 0x8
 		jne DONE
 		call CreateForInteractionObject
-		mov bl, al
+		mov bl, al 
 		mov eax, 0x61CB61
 		jmp eax
 		DONE :
@@ -884,12 +884,28 @@ __declspec(naked) void QueuedMenuRequestHook() {
 			jmp retnAddr
 	}
 }
+bool HasTopic(Actor* actor, const char* topicName)
+{
+	TESForm* form = LookupFormByEDID(topicName);
+	if (form == nullptr) return false;
+	TESTopic* topic = DYNAMIC_CAST(form, TESForm, TESTopic);
+	if (topic == nullptr) return false;
+	TESTopicInfo* topicInfo = topic->GetTopicInfo(actor, PlayerCharacter::GetSingleton());
+	if (topicInfo == nullptr) return false;
+	return true;
+}
+// check for some follower topics. this also checks conditions, so need to be careful
+bool __fastcall HasFollowerTopics(Actor* actor)
+{
+	return (HasTopic(actor, "FollowersTrade") && (HasTopic(actor, "FollowersLetsGo") || HasTopic(actor, "FollowersWait")))
+	|| (HasTopic(actor, "DogmeatPraise") && HasTopic(actor, "DogmeatScold"));
+}
 
 bool __fastcall IsConsciousAndNotAttackingPlayer(Actor* actor) {
 	UInt32 factionPtr = 0;
 	bool isConscious = ThisCall<bool>(0x6FAF20, actor);
 	bool shouldAttack = ThisCall<UInt8>(0x710630, actor, PlayerCharacter::GetSingleton(), 0, &factionPtr, 0);
-	return isConscious && !shouldAttack;
+	return (isConscious && !shouldAttack);
 }
 
 __declspec(naked) void ActivationHook() {
@@ -898,6 +914,9 @@ __declspec(naked) void ActivationHook() {
 		cmp byte ptr ds:[esi + 0x181], 0
 		jz DONE
 		cmp edi, 0x107A104
+		jz DONE
+		mov ecx, esi
+		call HasFollowerTopics
 		jz DONE
 		mov ecx, esi
 		call IsConsciousAndNotAttackingPlayer
@@ -930,6 +949,10 @@ __declspec(naked) void CreatureHook() {
 		cmp byte ptr ds:[esi + 0x181], 0
 		jz DONE
 		mov ecx, esi
+		call HasFollowerTopics
+		test al, al
+		jz DONE
+		mov ecx, esi
 		call IsConsciousAndNotAttackingPlayer
 		test al, al
 		jz DONERET
@@ -956,7 +979,7 @@ __declspec(naked) void CreatureHook() {
 }
 
 void __cdecl CreatureInCombatHook(int type, Actor* a2, int a3, int a4, int mode) {
-	if (IsConsciousAndNotAttackingPlayer(a2)) {
+	if (IsConsciousAndNotAttackingPlayer(a2) && HasFollowerTopics(a2)) {
 		CdeclCall<void>(0x61D5A0, 8, a2, 0, 0, 0);
 	}
 }
