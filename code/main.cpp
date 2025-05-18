@@ -15,7 +15,7 @@ bool FOSEPlugin_Query(const FOSEInterface * fose, PluginInfo * info)
 
 	info->infoVersion = PluginInfo::kInfoVersion;
 	info->name = "Companion Wheel";
-	info->version = 1;
+	info->version = 2;
 
 	if (fose->isEditor) {
 		return false;
